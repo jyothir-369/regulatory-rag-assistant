@@ -16,7 +16,7 @@ from rag_engine import setup_logging as rag_setup_logging
 # Environment
 from dotenv import load_dotenv
 
-# Optional (for metrics visualization)
+# Metrics visualization
 import pandas as pd
 import plotly.express as px
 
@@ -40,11 +40,11 @@ across multi-jurisdictional banking and securities frameworks.
 REGULATORY_BODIES = ["All Bodies", "RBI", "Basel Committee", "SEBI"]
 
 LLM_OPTIONS = {
-    "ollama": {
-        "name": "Ollama (Local - Llama3)",
-        "model": "llama3",
-        "requires_api_key": False,
-        "description": "Local LLM via Ollama - privacy-conscious, no API keys required"
+    "groq": {
+        "name": "Groq (Cloud - Llama 3.3 70B)",
+        "model": "llama-3.3-70b-versatile",
+        "requires_api_key": True,
+        "description": "Cloud LLM via Groq API - ultra-fast inference with Llama 3.3 70B, free-tier developer token friendly"
     },
     "openai": {
         "name": "OpenAI (Cloud - GPT-4o-mini)",
@@ -52,16 +52,14 @@ LLM_OPTIONS = {
         "requires_api_key": True,
         "description": "Cloud LLM via OpenAI - highest quality, requires a paid OpenAI API key"
     },
-    "groq": {
-        "name": "Groq (Cloud - Llama 3.3 70B)",
-        "model": "llama-3.3-70b-versatile",
-        "requires_api_key": True,
-        "description": "Cloud LLM via Groq API - ultra-fast inference with Llama 3.3 70B, free-tier developer token friendly"
+    "ollama": {
+        "name": "Ollama (Local - Llama3)",
+        "model": "llama3",
+        "requires_api_key": False,
+        "description": "Local LLM via Ollama - privacy-conscious, no API keys required"
     }
 }
 
-STREAMLIT_PORT   = 8501
-STREAMLIT_HOST   = "0.0.0.0"
 DEFAULT_TOP_K    = 5
 MAX_QUERY_LENGTH = 1000
 CHAT_HISTORY_KEY    = "chat_history"
@@ -115,33 +113,30 @@ def configure_streamlit_page():
 
 
 @st.cache_resource
-def initialize_rag_pipeline(llm_type: str = "ollama") -> Optional[RAGPipeline]:
-    """
-    Initialize the RAG pipeline.
-    """
+def initialize_rag_pipeline(llm_type: str = "groq") -> Optional[RAGPipeline]:
     logger = setup_logging()
     logger.info(f"Initializing RAG pipeline with {llm_type}...")
 
     try:
-        if llm_type == "openai":
-            if not os.getenv("OPENAI_API_KEY"):
-                st.error("❌ `OPENAI_API_KEY` not found in `.env` file or environment variables.")
-                return None
-            pipeline = RAGPipeline(
-                llm_type="openai",
-                openai_model_name="gpt-4o-mini"
-            )
-
-        elif llm_type == "groq":
+        if llm_type == "groq":
             groq_key = os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY")
             if not groq_key:
-                st.error("❌ Neither `GROQ_API_KEY` nor `OPENAI_API_KEY` found in `.env` file.")
+                st.error("❌ Neither `GROQ_API_KEY` nor `OPENAI_API_KEY` found in environment variables.")
                 return None
             os.environ["OPENAI_API_KEY"] = groq_key
             pipeline = RAGPipeline(
                 llm_type="openai",
                 openai_model_name="llama-3.3-70b-versatile",
                 openai_base_url="https://api.groq.com/openai/v1"
+            )
+
+        elif llm_type == "openai":
+            if not os.getenv("OPENAI_API_KEY"):
+                st.error("❌ `OPENAI_API_KEY` not found in environment variables.")
+                return None
+            pipeline = RAGPipeline(
+                llm_type="openai",
+                openai_model_name="gpt-4o-mini"
             )
 
         elif llm_type == "ollama":
@@ -170,7 +165,7 @@ def initialize_rag_pipeline(llm_type: str = "ollama") -> Optional[RAGPipeline]:
 def initialize_session_state():
     defaults = {
         CHAT_HISTORY_KEY:    [],
-        LLM_TYPE_KEY:        "ollama",
+        LLM_TYPE_KEY:        "groq",
         REGULATORY_BODY_KEY: "All Bodies",
         "last_result":       None,
         "is_loading":        False,
@@ -209,13 +204,11 @@ def render_sidebar() -> int:
         st.markdown("---")
 
         llm_options_list = [
-            {"value": "ollama", "label": LLM_OPTIONS["ollama"]["name"]},
+            {"value": "groq",   "label": LLM_OPTIONS["groq"]["name"]},
             {"value": "openai", "label": LLM_OPTIONS["openai"]["name"]},
-            {"value": "groq",   "label": LLM_OPTIONS["groq"]["name"]}
+            {"value": "ollama", "label": LLM_OPTIONS["ollama"]["name"]}
         ]
-        
-        # FIXED syntax error here:
-        current_idx = {"ollama": 0, "openai": 1, "groq": 2}.get(st.session_state[LLM_TYPE_KEY], 0)
+        current_idx = {"groq": 0, "openai": 1, "ollama": 2}.get(st.session_state[LLM_TYPE_KEY], 0)
 
         llm_selection = st.selectbox(
             label="🤖 LLM Provider",
@@ -251,48 +244,6 @@ def render_sidebar() -> int:
             st.session_state[REGULATORY_BODY_KEY] = selected_body
 
         top_k = st.slider("📊 Number of Citations (Top K)", min_value=1, max_value=10, value=DEFAULT_TOP_K, step=1)
-
-        # 📥 INGESTION SYSTEM FOR WEB APP
-        st.markdown("---")
-        st.subheader("📥 Ingest Documents")
-        uploaded_files = st.file_uploader(
-            "Upload Regulatory PDFs (RBI, SEBI, Basel III)", 
-            type=["pdf"], 
-            accept_multiple_files=True,
-            help="Directly parse and embed fresh statutory frameworks into ChromaDB"
-        )
-
-        if uploaded_files and st.button("🏗️ Index Framework Documents", use_container_width=True):
-            os.makedirs("data", exist_ok=True)
-            pipeline = initialize_rag_pipeline(st.session_state[LLM_TYPE_KEY])
-            
-            if pipeline:
-                success_count = 0
-                for file in uploaded_files:
-                    with st.spinner(f"Ingesting {file.name}..."):
-                        file_path = os.path.join("data", file.name)
-                        with open(file_path, "wb") as f:
-                            f.write(file.getbuffer())
-                        
-                        try:
-                            # Enhanced visibility to expose internal errors if ingestion fails
-                            if hasattr(pipeline, 'ingest_document'):
-                                pipeline.ingest_document(file_path)
-                                success_count += 1
-                            elif hasattr(pipeline, 'ingest'):
-                                pipeline.ingest(file_path)
-                                success_count += 1
-                            else:
-                                st.error(f"❌ Could not find an intake function inside your rag_engine.py configuration context.")
-                        except Exception as ingest_err:
-                            st.error(f"Failed to process and chunk {file.name} context.")
-                            st.exception(ingest_err)
-                
-                if success_count > 0:
-                    st.success(f"🎯 Successfully indexed {success_count} framework files!")
-                    st.session_state["last_result"] = None
-                    time.sleep(1.5)
-                    st.rerun()
 
         st.markdown("---")
         if st.button("🗑️ Clear Chat History", use_container_width=True):
@@ -378,7 +329,7 @@ def render_citation(citation: RetrieverResult, index: int):
             st.markdown(f"**BM25 Score:** `{getattr(citation, 'bm25_score', 0.0):.4f}`")
         st.markdown("---")
         st.text_area("Document Segment", value=citation.chunk_text, height=180,
-                     disabled=True, key=f"ta_cit_{index}_{chunk_id}")
+                    disabled=True, key=f"ta_cit_{index}_{chunk_id}")
         if st.button(f"📋 Copy Text [{index}]", key=f"cp_cit_{index}"):
             st.code(citation.chunk_text, language="text")
 
@@ -407,7 +358,7 @@ def render_answer(result: QueryResult):
                     st.plotly_chart(fig, use_container_width=True)
 
         st.markdown("🔗 **Source Citations**")
-        if getattr(result, 'citations', None) and result.retrieved_count > 0:
+        if getattr(result, 'citations', None):
             for i, cit in enumerate(result.citations):
                 render_citation(cit, i + 1)
         else:
@@ -481,20 +432,20 @@ def handle_query_error(error: Exception, query: str):
     err_str = str(error).lower()
     st.warning("💡 Suggested Fix:")
     if "api_key" in err_str or "groq" in err_str:
-        st.markdown("- Check your API key in the sidebar or `.env` file.")
+        st.markdown("- Check your API key in the sidebar or Secrets configuration.")
     elif "ollama" in err_str:
         st.markdown("- Run `ollama serve` and ensure `llama3` is pulled.")
     elif "chroma" in err_str or "collection" in err_str:
-        st.markdown("- Use the sidebar ingestion portal to rebuild the vector index.")
+        st.markdown("- Run `python ingest.py` to build the vector index.")
     else:
-        st.markdown("- Confirm uploaded PDFs match the targeted indexing formats.")
+        st.markdown("- Confirm PDFs are in `/data` and ingestion completed successfully.")
 
     if st.button("🔄 Retry", key="retry_btn"):
         st.rerun()
 
 
 # ==============================================================================
-# MAIN ENGINE
+# MAIN
 # ==============================================================================
 
 def main():
