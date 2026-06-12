@@ -66,7 +66,7 @@ class TextChunk:
 
 @dataclass
 class IngestionResult:
-    """Summary metrics of the ingestion pipeline execution execution sequence."""
+    """Summary metrics of the ingestion pipeline execution sequence."""
     total_documents: int
     successfully_processed: int
     failed_documents: int
@@ -81,9 +81,7 @@ class IngestionResult:
 # 3. LOGGING SETUP
 # ==========================================
 def setup_logging() -> logging.Logger:
-    """
-    Configure comprehensive logging with simultaneous file and console output.
-    """
+    """Configure comprehensive logging with simultaneous file and console output."""
     logger = logging.getLogger("RAGIngestion")
     logger.setLevel(logging.DEBUG)
     
@@ -115,9 +113,7 @@ def setup_logging() -> logging.Logger:
 # 4. PDF PARSING FUNCTIONS
 # ==========================================
 def extract_pdf_text(pdf_path: str, logger: logging.Logger) -> Tuple[str, List[int]]:
-    """
-    Extract text contents from a target PDF with detailed error handling.
-    """
+    """Extract text contents from a target PDF with detailed error handling."""
     path_obj = Path(pdf_path)
     if not path_obj.exists():
         logger.error(f"IO Failure: Target document path does not exist: {pdf_path}")
@@ -161,9 +157,7 @@ def extract_pdf_text(pdf_path: str, logger: logging.Logger) -> Tuple[str, List[i
         raise RuntimeError(f"Failed parsing PDF structures for {pdf_path}: {str(raw_exception)}")
 
 def determine_regulatory_body(pdf_filename: str, logger: logging.Logger) -> str:
-    """
-    Classify structural provenance matrix based on legal compliance entity naming patterns.
-    """
+    """Classify structural provenance matrix based on legal compliance entity naming patterns."""
     fn_lower = pdf_filename.lower()
     
     rbi_triggers = ['rbi', 'reserve bank', 'central banking', 'agency bank', 'pension', 'bonds', 'dealers']
@@ -181,9 +175,7 @@ def determine_regulatory_body(pdf_filename: str, logger: logging.Logger) -> str:
         return "Unknown"
 
 def split_into_pages(text: str, page_starts: List[int]) -> List[Tuple[int, str]]:
-    """
-    Segment the massive raw extraction text stream back into clean page-level chunks.
-    """
+    """Segment the massive raw extraction text stream back into clean page-level chunks."""
     segments: List[Tuple[int, str]] = []
     total_registered_pages = len(page_starts)
     
@@ -206,9 +198,7 @@ def split_into_pages(text: str, page_starts: List[int]) -> List[Tuple[int, str]]
 # 5. HIERARCHICAL TOKEN CHUNKING
 # ==========================================
 def tokenize_text(text: str) -> List[str]:
-    """
-    Tokenize standard compliance text using a precise character-preservation regex scanner.
-    """
+    """Tokenize standard compliance text using a precise character-preservation regex scanner."""
     text_lower = text.lower()
     token_pattern = re.compile(r'[a-z0-9]+(?:[-./_][a-z0-9]+)*|₹|%')
     return token_pattern.findall(text_lower)
@@ -221,9 +211,7 @@ def create_hierarchical_chunks(
     document_path: str,
     logger: logging.Logger
 ) -> List[TextChunk]:
-    """
-    Transforms structural page layers into optimized child vector segments via sliding window parsing.
-    """
+    """Transforms structural page layers into optimized child vector segments via sliding window parsing."""
     provisional_chunks: List[Tuple[str, List[str], int, int]] = []
     total_token_count = 0
     
@@ -342,9 +330,7 @@ def create_chroma_db(
     db_path: str = CHROMA_DB_PATH,
     logger: Optional[logging.Logger] = None
 ) -> chromadb.Collection:
-    """
-    Constructs, initializes, and hydrates persistent local database vector store schemas.
-    """
+    """Constructs, initializes, and hydrates persistent local database vector store schemas."""
     logger = logger or logging.getLogger("RAGIngestion")
     logger.info(f"Initializing connection to Vector Storage at: {db_path}")
     
@@ -414,9 +400,7 @@ def create_bm25_index(
     index_path: str = BM25_INDEX_PATH,
     logger: Optional[logging.Logger] = None
 ) -> Tuple[BM25Okapi, Dict[str, int]]:
-    """
-    Constructs token correlation structural matrices and serializes sparse search files.
-    """
+    """Constructs token correlation structural matrices and serializes sparse search files."""
     logger = logger or logging.getLogger("RAGIngestion")
     logger.info("Initializing serialization tasks for Lexical BM25 Sparse Inverted Index...")
     
@@ -461,9 +445,7 @@ def ingest_regulatory_documents(
     force_re_ingest: bool = True,
     logger: Optional[logging.Logger] = None
 ) -> IngestionResult:
-    """
-    Main orchestration driver executing parsing pipeline functions sequentially.
-    """
+    """Main orchestration driver executing parsing pipeline functions sequentially."""
     logger = logger or setup_logging()
     execution_start_timestamp = time.time()
     
@@ -484,13 +466,17 @@ def ingest_regulatory_documents(
     if force_re_ingest:
         cleanup_existing_indexes(CHROMA_DB_PATH, BM25_INDEX_PATH, logger)
         
-    pdf_files_to_process = [f for f in os.listdir(target_data_path) if f.lower().endswith('.pdf')]
+    # FIX CODE BRANCH HERE: Standardized to catch both file strings (.pdf and .pdf.pdf)
+    pdf_files_to_process = [
+        f for f in os.listdir(target_data_path) 
+        if f.lower().endswith('.pdf') or f.lower().endswith('.pdf.pdf')
+    ]
     total_discovered_count = len(pdf_files_to_process)
     
     logger.info(f"Workspace Scan complete. Identified {total_discovered_count} source compliance files for structural ingestion processing.")
     
     if total_discovered_count == 0:
-        msg = "Validation Warning: Ingestion halts. No target PDF documents located inside source storage folder vectors."
+        msg = f"Validation Warning: Ingestion halts. No target PDF documents located inside folder path: {target_data_path.resolve()}"
         logger.warning(msg)
         return IngestionResult(0, 0, 0, 0, 0, CHROMA_DB_PATH, BM25_INDEX_PATH, 0.0, [msg])
         
@@ -513,9 +499,11 @@ def ingest_regulatory_documents(
             # Step 4: Token slicing logic tracking cycles
             internal_document_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, file_name))
             
-            # CRITICAL BUGFIX: Sanitize the document title metadata boundary to remove raw duplicate .pdf tracking artifacts
+            # SANITIZATION RULE UPDATED: Gracefully handle structural trailing duplication variants
             sanitized_title = Path(file_name).name
-            if sanitized_title.lower().endswith('.pdf'):
+            if sanitized_title.lower().endswith('.pdf.pdf'):
+                sanitized_title = sanitized_title[:-8]
+            elif sanitized_title.lower().endswith('.pdf'):
                 sanitized_title = sanitized_title[:-4]
             
             document_processed_chunks = create_hierarchical_chunks(
@@ -608,7 +596,7 @@ def validate_pdf_count(data_dir: str, expected_count: int = 11, logger: Optional
     if not target_path.exists():
         return []
         
-    found_pdfs = [f for f in os.listdir(target_path) if f.lower().endswith('.pdf')]
+    found_pdfs = [f for f in os.listdir(target_path) if f.lower().endswith('.pdf') or f.lower().endswith('.pdf.pdf')]
     actual_count = len(found_pdfs)
     
     if actual_count != expected_count:
