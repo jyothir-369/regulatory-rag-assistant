@@ -30,6 +30,15 @@ from rank_bm25 import BM25Okapi
 from sentence_transformers import CrossEncoder
 from dotenv import load_dotenv
 
+# Fail-fast top-level check to ensure environment dependencies are present
+try:
+    from openai import OpenAI
+except ImportError as e:
+    raise ImportError(
+        "Critical dependency missing: 'openai' package could not be imported at engine startup. "
+        "Verify that 'openai' is present on its own line inside your requirements.txt file."
+    ) from e
+
 # ------------------------------------------------------------------------------
 # DATA CLASSES
 # ------------------------------------------------------------------------------
@@ -82,7 +91,7 @@ class TextChunk:
 
 
 # ------------------------------------------------------------------------------
-# GLOBAL GLOBAL PARAMETERS & ARCHITECTURE VALUES
+# GLOBAL PARAMETERS & ARCHITECTURE VALUES
 # ------------------------------------------------------------------------------
 
 VECTOR_TOP_K:       int   = 10
@@ -508,16 +517,12 @@ class RAGPipeline:
                 self.logger.error("API Key initialization aborted: missing token inside context layer pools.")
                 return
 
-            try:
-                from openai import OpenAI
-                if self.openai_base_url:
-                    self.openai_client = OpenAI(api_key=api_key, base_url=self.openai_base_url)
-                    self.logger.info(f"OpenAI-compatible engine routed to endpoint: {self.openai_base_url}")
-                else:
-                    self.openai_client = OpenAI(api_key=api_key)
-                    self.logger.info("OpenAI client configured with default engine endpoint.")
-            except ImportError:
-                self.logger.error("Dependencies configuration mismatch: 'openai' library missing.")
+            if self.openai_base_url:
+                self.openai_client = OpenAI(api_key=api_key, base_url=self.openai_base_url)
+                self.logger.info(f"OpenAI-compatible engine routed to endpoint: {self.openai_base_url}")
+            else:
+                self.openai_client = OpenAI(api_key=api_key)
+                self.logger.info("OpenAI client configured with default engine endpoint.")
 
         elif self.llm_type == "ollama":
             self.logger.info("Ollama routing set active. Generation context mapped directly to localized instance loops.")
