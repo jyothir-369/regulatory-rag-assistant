@@ -1,12 +1,8 @@
 streamlit
-plotly
-pandas
-numpy==1.26.4
-chromadb==0.4.24
-protobuf==4.25.3
+chromadb
 rank_bm25
 sentence-transformers
+numpy
 python-dotenv
+openai
 requests
-torchvision
-ollama
