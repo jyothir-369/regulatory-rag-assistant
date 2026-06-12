@@ -205,14 +205,19 @@ class HybridRetriever:
         self.chroma_path = chroma_path
         self.bm25_path   = bm25_path
 
-        # ChromaDB
+       # ----------------------------------------------------------------------
+        # ChromaDB - Modified to allow graceful blank index initialization
+        # ----------------------------------------------------------------------
         try:
             self.chroma_client     = chromadb.PersistentClient(path=self.chroma_path)
-            self.chroma_collection = self.chroma_client.get_collection(name="regulatory_documents")
-            self.logger.info(f"ChromaDB loaded from {self.chroma_path} ({self.chroma_collection.count()} docs)")
+            # CHANGED: Using get_or_create_collection so it boots clean if empty
+            self.chroma_collection = self.chroma_client.get_or_create_collection(name="regulatory_documents")
+            self.logger.info(f"ChromaDB initialized at {self.chroma_path} (Current doc count: {self.chroma_collection.count()})")
         except Exception as e:
             self.logger.critical(f"ChromaDB connection failed: {e}")
-            raise RuntimeWarning("Vector index unavailable") from e
+            # Dynamic recovery guardrail to keep the Streamlit Cloud dashboard alive
+            self.chroma_collection = None
+            self.logger.warning("Pipeline proceeding in degraded state. Data ingestion required.")
 
         # BM25
         self.bm25_index: Optional[BM25Okapi] = None
