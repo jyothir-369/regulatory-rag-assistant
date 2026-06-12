@@ -10,7 +10,7 @@ pypdf2>=3.0.1
 python-dotenv>=1.0.1
 pandas>=2.2.1
 plotly>=5.19.0
-numpy>=1.26.0
+numpy==1.26.4
 torch --extra-index-url https://download.pytorch.org/whl/cpu
 transformers
 ollama
