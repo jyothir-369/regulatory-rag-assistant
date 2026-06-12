@@ -453,8 +453,25 @@ class RAGPipeline:
         self.logger = logger_instance or logger
         load_dotenv()
 
-        # Fallback evaluation matrix to capture cloud deployment configuration keys
-        env_llm_type = os.getenv("LLM_TYPE")
+        # Check Streamlit Cloud Secrets interface safely first, then look at os.environ
+        st_secrets = {}
+        try:
+            import streamlit as st
+            if hasattr(st, "secrets") and st.secrets:
+                st_secrets = {k: v for k, v in st.secrets.items()}
+        except Exception:
+            pass
+
+        def get_env_or_secret(key: str, default: Any = None) -> Any:
+            """Pulls context values across stream-context blocks seamlessly."""
+            val = os.getenv(key)
+            if val is not None:
+                return val
+            if key in st_secrets:
+                return str(st_secrets[key])
+            return default
+
+        env_llm_type = get_env_or_secret("LLM_TYPE")
         if llm_type:
             self.llm_type = llm_type.lower()
         elif env_llm_type:
@@ -462,9 +479,9 @@ class RAGPipeline:
         else:
             self.llm_type = "openai" 
 
-        self.llm_model_name    = os.getenv("LLM_MODEL_NAME", llm_model_name)
-        self.openai_model_name = os.getenv("OPENAI_MODEL_NAME", openai_model_name)
-        self.openai_base_url   = openai_base_url or os.getenv("OPENAI_BASE_URL")
+        self.llm_model_name    = get_env_or_secret("LLM_MODEL_NAME", llm_model_name)
+        self.openai_model_name = get_env_or_secret("OPENAI_MODEL_NAME", openai_model_name)
+        self.openai_base_url   = openai_base_url or get_env_or_secret("OPENAI_BASE_URL")
 
         self.hybrid_retriever = HybridRetriever(logger_instance=self.logger)
         self.reranker         = CrossEncoderReranker(logger_instance=self.logger)
@@ -472,18 +489,23 @@ class RAGPipeline:
         # Explicit attribute initialization prevents downstream initialization AttributeErrors
         self.openai_client = None 
 
-        self._setup_llm_client()
+        self._setup_llm_client(get_env_or_secret)
         self.logger.info(f"RAGPipeline initialized | provider={self.llm_type} | base_url={self.openai_base_url or 'default'}")
 
-    def _setup_llm_client(self) -> None:
+    def _setup_llm_client(self, resolver_func) -> None:
         """Establish the LLM connection layer securely without silent class failures."""
         openai_equivalent_types = ["openai", "groq", "grok", "xai"]
 
         if self.llm_type in openai_equivalent_types:
-            api_key = os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY") or os.getenv("XAI_API_KEY")
+            # Fallback checking matrix traverses every variable name iteration
+            api_key = (
+                resolver_func("OPENAI_API_KEY") or 
+                resolver_func("GROQ_API_KEY") or 
+                resolver_func("XAI_API_KEY")
+            )
             
             if not api_key:
-                self.logger.error("API Key initialization aborted: missing token in environment variables.")
+                self.logger.error("API Key initialization aborted: missing token inside context layer pools.")
                 return
 
             try:
