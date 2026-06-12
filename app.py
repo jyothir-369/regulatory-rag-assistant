@@ -213,7 +213,9 @@ def render_sidebar() -> int:
             {"value": "openai", "label": LLM_OPTIONS["openai"]["name"]},
             {"value": "groq",   "label": LLM_OPTIONS["groq"]["name"]}
         ]
-        current_idx = {"ollama": 0, "openai": 1, "groq": 2].get(st.session_state[LLM_TYPE_KEY], 0)
+        
+        # FIXED: Changed closing bracket ']' to curly brace '}'
+        current_idx = {"ollama": 0, "openai": 1, "groq": 2}.get(st.session_state[LLM_TYPE_KEY], 0)
 
         llm_selection = st.selectbox(
             label="🤖 LLM Provider",
@@ -250,7 +252,7 @@ def render_sidebar() -> int:
 
         top_k = st.slider("📊 Number of Citations (Top K)", min_value=1, max_value=10, value=DEFAULT_TOP_K, step=1)
 
-        # 📥 NEW: RUNTIME DOCUMENT INGESTION INTERFACE FOR CLOUD CONTAINERS
+        # 📥 INGESTION SYSTEM FOR WEB APP IN CLOUD CONTAINERS
         st.markdown("---")
         st.subheader("📥 Ingest Documents")
         uploaded_files = st.file_uploader(
@@ -273,7 +275,6 @@ def render_sidebar() -> int:
                             f.write(file.getbuffer())
                         
                         try:
-                            # Assumes a matching document ingestion method exists on RAGPipeline
                             if hasattr(pipeline, 'ingest_document'):
                                 pipeline.ingest_document(file_path)
                             elif hasattr(pipeline, 'ingest'):
@@ -284,7 +285,6 @@ def render_sidebar() -> int:
                 
                 if success_count > 0:
                     st.success(f"🎯 Successfully indexed {success_count} framework files!")
-                    # Clear st.cache_resource or state if necessary to point back to fresh DB metrics
                     st.session_state["last_result"] = None
                     time.sleep(1.5)
                     st.rerun()
@@ -489,7 +489,7 @@ def handle_query_error(error: Exception, query: str):
 
 
 # ==============================================================================
-# MAIN MAIN ENGINE
+# MAIN ENGINE
 # ==============================================================================
 
 def main():
