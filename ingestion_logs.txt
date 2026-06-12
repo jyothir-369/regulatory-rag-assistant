@@ -1,0 +1,280 @@
+2026-06-12 02:00:33 | INFO     | ingest:715 | Workspace Audit Verified: Perfect data structure match. All 11 compliance manuals accounted for.
+2026-06-12 02:00:33 | INFO     | ingest:577 | =========================================================================
+2026-06-12 02:00:33 | INFO     | ingest:578 | LAUNCHING ENTERPRISE REGULATORY COMPLIANCE RAG INGESTION PIPELINE
+2026-06-12 02:00:33 | INFO     | ingest:579 | Targeting Source Workspace: C:\Users\raghava\OneDrive\Desktop\regulatory_rag\data
+2026-06-12 02:00:33 | INFO     | ingest:580 | =========================================================================
+2026-06-12 02:00:33 | INFO     | ingest:593 | Workspace Scan complete. Identified 11 source compliance files for structural ingestion processing.
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_III_2017.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_III_2017.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [Basel_III_2017.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [Basel_LCR_2013.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [Basel_Market_Risk_2019.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [Basel_NSFR_2014.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Agency_Commission_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Master_Directions_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Operational_Guidelines_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Pension_Disbursement_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_ICDR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_LODR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:00:33 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:00:33 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_PIT_2025.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:00:33 | ERROR    | ingest:642 | Critical Pipeline Halt: Processing cycles terminated. Extracted text chunk calculations resulted in 0 records.
+2026-06-12 02:02:23 | INFO     | ingest:715 | Workspace Audit Verified: Perfect data structure match. All 11 compliance manuals accounted for.
+2026-06-12 02:02:23 | INFO     | ingest:577 | =========================================================================
+2026-06-12 02:02:23 | INFO     | ingest:578 | LAUNCHING ENTERPRISE REGULATORY COMPLIANCE RAG INGESTION PIPELINE
+2026-06-12 02:02:23 | INFO     | ingest:579 | Targeting Source Workspace: C:\Users\raghava\OneDrive\Desktop\regulatory_rag\data
+2026-06-12 02:02:23 | INFO     | ingest:580 | =========================================================================
+2026-06-12 02:02:23 | INFO     | ingest:593 | Workspace Scan complete. Identified 11 source compliance files for structural ingestion processing.
+2026-06-12 02:02:23 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_III_2017.pdf.pdf
+2026-06-12 02:02:23 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_III_2017.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [Basel_III_2017.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [Basel_LCR_2013.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [Basel_Market_Risk_2019.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [Basel_NSFR_2014.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Agency_Commission_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Master_Directions_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Operational_Guidelines_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:02:24 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Pension_Disbursement_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:24 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:02:24 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:02:25 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:25 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_ICDR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:25 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:02:25 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:02:25 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:25 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_LODR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:25 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:02:25 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:02:25 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:25 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_PIT_2025.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:25 | ERROR    | ingest:642 | Critical Pipeline Halt: Processing cycles terminated. Extracted text chunk calculations resulted in 0 records.
+2026-06-12 02:02:42 | INFO     | ingest:715 | Workspace Audit Verified: Perfect data structure match. All 11 compliance manuals accounted for.
+2026-06-12 02:02:42 | INFO     | ingest:577 | =========================================================================
+2026-06-12 02:02:42 | INFO     | ingest:578 | LAUNCHING ENTERPRISE REGULATORY COMPLIANCE RAG INGESTION PIPELINE
+2026-06-12 02:02:42 | INFO     | ingest:579 | Targeting Source Workspace: C:\Users\raghava\OneDrive\Desktop\regulatory_rag\data
+2026-06-12 02:02:42 | INFO     | ingest:580 | =========================================================================
+2026-06-12 02:02:42 | INFO     | ingest:593 | Workspace Scan complete. Identified 11 source compliance files for structural ingestion processing.
+2026-06-12 02:02:42 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_III_2017.pdf.pdf
+2026-06-12 02:02:42 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_III_2017.pdf.pdf
+2026-06-12 02:02:42 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:42 | ERROR    | ingest:634 | Pipeline Interruption [Basel_III_2017.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:42 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:02:42 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:02:43 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | ERROR    | ingest:634 | Pipeline Interruption [Basel_LCR_2013.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:02:43 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:02:43 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | ERROR    | ingest:634 | Pipeline Interruption [Basel_Market_Risk_2019.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:02:43 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:02:43 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | ERROR    | ingest:634 | Pipeline Interruption [Basel_NSFR_2014.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:02:43 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:02:43 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Agency_Commission_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:02:43 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:02:43 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Master_Directions_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:02:43 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:02:43 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Operational_Guidelines_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:43 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:02:43 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:02:44 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:44 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Pension_Disbursement_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:44 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:02:44 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:02:45 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:45 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_ICDR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:45 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:02:45 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:02:45 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:45 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_LODR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:45 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:02:45 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:02:45 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:45 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_PIT_2025.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:02:45 | ERROR    | ingest:642 | Critical Pipeline Halt: Processing cycles terminated. Extracted text chunk calculations resulted in 0 records.
+2026-06-12 02:03:46 | INFO     | ingest:715 | Workspace Audit Verified: Perfect data structure match. All 11 compliance manuals accounted for.
+2026-06-12 02:03:46 | INFO     | ingest:577 | =========================================================================
+2026-06-12 02:03:46 | INFO     | ingest:578 | LAUNCHING ENTERPRISE REGULATORY COMPLIANCE RAG INGESTION PIPELINE
+2026-06-12 02:03:46 | INFO     | ingest:579 | Targeting Source Workspace: C:\Users\raghava\OneDrive\Desktop\regulatory_rag\data
+2026-06-12 02:03:46 | INFO     | ingest:580 | =========================================================================
+2026-06-12 02:03:46 | INFO     | ingest:593 | Workspace Scan complete. Identified 11 source compliance files for structural ingestion processing.
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_III_2017.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_III_2017.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [Basel_III_2017.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_III_2017.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [Basel_LCR_2013.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_LCR_2013.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [Basel_Market_Risk_2019.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_Market_Risk_2019.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [Basel_NSFR_2014.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\Basel_NSFR_2014.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Agency_Commission_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Agency_Commission_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Master_Directions_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Master_Directions_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Operational_Guidelines_2018.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Operational_Guidelines_2018.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:03:46 | ERROR    | ingest:185 | Critical execution fault during parsing phase of RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | ERROR    | ingest:634 | Pipeline Interruption [RBI_Pension_Disbursement_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\RBI_Pension_Disbursement_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:46 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:03:46 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:03:47 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:47 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_ICDR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_ICDR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:47 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:03:47 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:03:47 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:47 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_LODR_2026.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_LODR_2026.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:47 | INFO     | ingest:604 | Processing structural pipeline workflow states for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:03:47 | INFO     | ingest:147 | Initiating binary text extraction sequence for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:03:47 | ERROR    | ingest:185 | Critical execution fault during parsing phase of SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:47 | ERROR    | ingest:634 | Pipeline Interruption [SEBI_PIT_2025.pdf.pdf]: Processing failure profile -> Failed parsing PDF structures for data\SEBI_PIT_2025.pdf.pdf: 'PDF' object has no attribute 'is_encrypted'
+2026-06-12 02:03:47 | ERROR    | ingest:642 | Critical Pipeline Halt: Processing cycles terminated. Extracted text chunk calculations resulted in 0 records.
+2026-06-12 02:06:15 | INFO     | ingest:494 | =========================================================================
+2026-06-12 02:06:15 | INFO     | ingest:495 | LAUNCHING ENTERPRISE REGULATORY COMPLIANCE RAG INGESTION PIPELINE
+2026-06-12 02:06:15 | INFO     | ingest:496 | Targeting Source Workspace: C:\Users\raghava\OneDrive\Desktop\regulatory_rag\data
+2026-06-12 02:06:15 | INFO     | ingest:497 | =========================================================================
+2026-06-12 02:06:15 | INFO     | ingest:510 | Workspace Scan complete. Identified 11 source compliance files for structural ingestion processing.
+2026-06-12 02:06:15 | INFO     | ingest:521 | Processing structural pipeline workflow states for: Basel_III_2017.pdf.pdf
+2026-06-12 02:06:15 | INFO     | ingest:134 | Initiating binary text extraction sequence for: Basel_III_2017.pdf.pdf
+2026-06-12 02:06:31 | DEBUG    | ingest:165 | Document Metrics Summary [Basel_III_2017.pdf.pdf] - Pages: 75 | Chars: 215925 | Estimated Words: 33582
+2026-06-12 02:06:31 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [Basel_III_2017.pdf.pdf]: Extracted 111 text chunks encompassing 35728 tokens.
+2026-06-12 02:06:31 | INFO     | ingest:547 | Successfully digested Basel_III_2017.pdf.pdf -> Formatted 111 structural chunks.
+2026-06-12 02:06:31 | INFO     | ingest:521 | Processing structural pipeline workflow states for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:06:31 | INFO     | ingest:134 | Initiating binary text extraction sequence for: Basel_LCR_2013.pdf.pdf
+2026-06-12 02:07:03 | DEBUG    | ingest:165 | Document Metrics Summary [Basel_LCR_2013.pdf.pdf] - Pages: 162 | Chars: 524016 | Estimated Words: 82512
+2026-06-12 02:07:03 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [Basel_LCR_2013.pdf.pdf]: Extracted 261 text chunks encompassing 87753 tokens.
+2026-06-12 02:07:03 | INFO     | ingest:547 | Successfully digested Basel_LCR_2013.pdf.pdf -> Formatted 261 structural chunks.
+2026-06-12 02:07:03 | INFO     | ingest:521 | Processing structural pipeline workflow states for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:07:03 | INFO     | ingest:134 | Initiating binary text extraction sequence for: Basel_Market_Risk_2019.pdf.pdf
+2026-06-12 02:07:06 | DEBUG    | ingest:165 | Document Metrics Summary [Basel_Market_Risk_2019.pdf.pdf] - Pages: 17 | Chars: 43828 | Estimated Words: 6640
+2026-06-12 02:07:06 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [Basel_Market_Risk_2019.pdf.pdf]: Extracted 22 text chunks encompassing 6980 tokens.
+2026-06-12 02:07:06 | INFO     | ingest:547 | Successfully digested Basel_Market_Risk_2019.pdf.pdf -> Formatted 22 structural chunks.
+2026-06-12 02:07:06 | INFO     | ingest:521 | Processing structural pipeline workflow states for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:07:06 | INFO     | ingest:134 | Initiating binary text extraction sequence for: Basel_NSFR_2014.pdf.pdf
+2026-06-12 02:07:27 | DEBUG    | ingest:165 | Document Metrics Summary [Basel_NSFR_2014.pdf.pdf] - Pages: 136 | Chars: 386814 | Estimated Words: 60178
+2026-06-12 02:07:27 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [Basel_NSFR_2014.pdf.pdf]: Extracted 182 text chunks encompassing 63263 tokens.
+2026-06-12 02:07:27 | INFO     | ingest:547 | Successfully digested Basel_NSFR_2014.pdf.pdf -> Formatted 182 structural chunks.
+2026-06-12 02:07:27 | INFO     | ingest:521 | Processing structural pipeline workflow states for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:07:27 | INFO     | ingest:134 | Initiating binary text extraction sequence for: RBI_Agency_Commission_2026.pdf.pdf
+2026-06-12 02:07:31 | DEBUG    | ingest:165 | Document Metrics Summary [RBI_Agency_Commission_2026.pdf.pdf] - Pages: 35 | Chars: 51857 | Estimated Words: 7763
+2026-06-12 02:07:31 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [RBI_Agency_Commission_2026.pdf.pdf]: Extracted 34 text chunks encompassing 7740 tokens.
+2026-06-12 02:07:31 | INFO     | ingest:547 | Successfully digested RBI_Agency_Commission_2026.pdf.pdf -> Formatted 34 structural chunks.
+2026-06-12 02:07:31 | INFO     | ingest:521 | Processing structural pipeline workflow states for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:07:31 | INFO     | ingest:134 | Initiating binary text extraction sequence for: RBI_Master_Directions_2018.pdf.pdf
+2026-06-12 02:07:32 | DEBUG    | ingest:165 | Document Metrics Summary [RBI_Master_Directions_2018.pdf.pdf] - Pages: 6 | Chars: 9027 | Estimated Words: 1419
+2026-06-12 02:07:32 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [RBI_Master_Directions_2018.pdf.pdf]: Extracted 6 text chunks encompassing 1343 tokens.
+2026-06-12 02:07:32 | INFO     | ingest:547 | Successfully digested RBI_Master_Directions_2018.pdf.pdf -> Formatted 6 structural chunks.
+2026-06-12 02:07:32 | INFO     | ingest:521 | Processing structural pipeline workflow states for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:07:32 | INFO     | ingest:134 | Initiating binary text extraction sequence for: RBI_Operational_Guidelines_2018.pdf.pdf
+2026-06-12 02:07:41 | DEBUG    | ingest:165 | Document Metrics Summary [RBI_Operational_Guidelines_2018.pdf.pdf] - Pages: 70 | Chars: 120747 | Estimated Words: 18917
+2026-06-12 02:07:41 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [RBI_Operational_Guidelines_2018.pdf.pdf]: Extracted 72 text chunks encompassing 19101 tokens.
+2026-06-12 02:07:41 | INFO     | ingest:547 | Successfully digested RBI_Operational_Guidelines_2018.pdf.pdf -> Formatted 72 structural chunks.
+2026-06-12 02:07:41 | INFO     | ingest:521 | Processing structural pipeline workflow states for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:07:41 | INFO     | ingest:134 | Initiating binary text extraction sequence for: RBI_Pension_Disbursement_2026.pdf.pdf
+2026-06-12 02:07:43 | DEBUG    | ingest:165 | Document Metrics Summary [RBI_Pension_Disbursement_2026.pdf.pdf] - Pages: 20 | Chars: 26110 | Estimated Words: 3593
+2026-06-12 02:07:43 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [RBI_Pension_Disbursement_2026.pdf.pdf]: Extracted 20 text chunks encompassing 3551 tokens.
+2026-06-12 02:07:43 | INFO     | ingest:547 | Successfully digested RBI_Pension_Disbursement_2026.pdf.pdf -> Formatted 20 structural chunks.
+2026-06-12 02:07:43 | INFO     | ingest:521 | Processing structural pipeline workflow states for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:07:43 | INFO     | ingest:134 | Initiating binary text extraction sequence for: SEBI_ICDR_2026.pdf.pdf
+2026-06-12 02:08:50 | DEBUG    | ingest:165 | Document Metrics Summary [SEBI_ICDR_2026.pdf.pdf] - Pages: 482 | Chars: 1127063 | Estimated Words: 177904
+2026-06-12 02:08:50 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [SEBI_ICDR_2026.pdf.pdf]: Extracted 500 text chunks encompassing 180612 tokens.
+2026-06-12 02:08:50 | INFO     | ingest:547 | Successfully digested SEBI_ICDR_2026.pdf.pdf -> Formatted 500 structural chunks.
+2026-06-12 02:08:50 | INFO     | ingest:521 | Processing structural pipeline workflow states for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:08:50 | INFO     | ingest:134 | Initiating binary text extraction sequence for: SEBI_LODR_2026.pdf.pdf
+2026-06-12 02:09:31 | DEBUG    | ingest:165 | Document Metrics Summary [SEBI_LODR_2026.pdf.pdf] - Pages: 231 | Chars: 650083 | Estimated Words: 97511
+2026-06-12 02:09:31 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [SEBI_LODR_2026.pdf.pdf]: Extracted 285 text chunks encompassing 101531 tokens.
+2026-06-12 02:09:31 | INFO     | ingest:547 | Successfully digested SEBI_LODR_2026.pdf.pdf -> Formatted 285 structural chunks.
+2026-06-12 02:09:31 | INFO     | ingest:521 | Processing structural pipeline workflow states for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:09:31 | INFO     | ingest:134 | Initiating binary text extraction sequence for: SEBI_PIT_2025.pdf.pdf
+2026-06-12 02:09:43 | DEBUG    | ingest:165 | Document Metrics Summary [SEBI_PIT_2025.pdf.pdf] - Pages: 81 | Chars: 159672 | Estimated Words: 24553
+2026-06-12 02:09:43 | DEBUG    | ingest:296 | Hierarchical Chunk Generation [SEBI_PIT_2025.pdf.pdf]: Extracted 80 text chunks encompassing 24735 tokens.
+2026-06-12 02:09:43 | INFO     | ingest:547 | Successfully digested SEBI_PIT_2025.pdf.pdf -> Formatted 80 structural chunks.
+2026-06-12 02:09:43 | INFO     | ingest:310 | Loading dense semantic embedding transformer: sentence-transformers/all-MiniLM-L6-v2
+2026-06-12 02:10:07 | INFO     | ingest:316 | Embedding infrastructure initialized. Vector Dimension mapping constraints: 384
+2026-06-12 02:10:07 | INFO     | ingest:369 | Initializing connection to Vector Storage at: ./chroma_db
+2026-06-12 02:10:07 | INFO     | ingest:384 | Computing dense vectors and building index records...
+2026-06-12 02:12:16 | INFO     | ingest:426 | Vector Database sync operations complete. Registered records count: 1573
+2026-06-12 02:12:16 | INFO     | ingest:441 | Initializing serialization tasks for Lexical BM25 Sparse Inverted Index...
+2026-06-12 02:12:16 | INFO     | ingest:469 | Sparse inverted mapping payload saved. Avg document length: 338.42 tokens. Location: C:\Users\raghava\OneDrive\Desktop\regulatory_rag\bm25_index
+2026-06-12 02:12:16 | INFO     | ingest:587 | =========================================================================
+2026-06-12 02:12:16 | INFO     | ingest:588 | ✅ ENTERPRISE REGULATORY COMPLIANCE INGESTION SEQUENCE RUN COMPLETE
+2026-06-12 02:12:16 | INFO     | ingest:589 |  - Total Discovered Documents: 11
+2026-06-12 02:12:16 | INFO     | ingest:590 |  - Successfully Handled Profile Chunks: 11
+2026-06-12 02:12:16 | INFO     | ingest:591 |  - Aggregated Error Fault Tracks: 0
+2026-06-12 02:12:16 | INFO     | ingest:592 |  - Persistent Vector Database Entries Written: 1573
+2026-06-12 02:12:16 | INFO     | ingest:593 |  - Total Tokens Managed In Corpus Matrices: 532337
+2026-06-12 02:12:16 | INFO     | ingest:594 |  - Total Measured Engine Execution Duration: 360.53 seconds
+2026-06-12 02:12:16 | INFO     | ingest:595 | =========================================================================
