@@ -277,8 +277,8 @@ def render_sidebar() -> int:
                         try:
                             if hasattr(pipeline, 'ingest_document'):
                                 pipeline.ingest_document(file_path)
-                            elif hasattr(pipeline, 'ingest'):
-                                pipeline.ingest(file_path)
+                            elif hasattr(pipeline, 'your_exact_function_name_here'):
+                                pipeline.your_exact_function_name_here(file_path)
                             success_count += 1
                         except Exception as ingest_err:
                             st.error(f"Failed to ingest {file.name}: {ingest_err}")
