@@ -31,11 +31,10 @@ from rank_bm25 import BM25Okapi
 import sentence_transformers
 from sentence_transformers import CrossEncoder
 from dotenv import load_dotenv
-import ollama
 
 
 # ------------------------------------------------------------------------------
-# DATA CLASSES  (mirrors ingest.py — replace with `from ingest import ...` if available)
+# DATA CLASSES
 # ------------------------------------------------------------------------------
 
 @dataclass
@@ -126,20 +125,7 @@ class QueryResult:
     citations:                    List[RetrieverResult]
     retrieved_count:              int
     total_processing_time_seconds: float
-    retrieval_stage_times:        Dict[str, float]
-
-
-@dataclass
-class RetrievalMetrics:
-    """Evaluation metrics for retrieval quality profiling."""
-    hit_rate_at_3:          float
-    hit_rate_at_5:          float
-    hit_rate_at_10:         float
-    mean_reciprocal_rank:   float
-    average_vector_score:   float
-    average_bm25_score:     float
-    average_rerank_score:   float
-    total_queries_evaluated: int
+    retRetrieval_stage_times:     Dict[str, float]
 
 
 # ------------------------------------------------------------------------------
@@ -206,26 +192,22 @@ class HybridRetriever:
         self.chroma_path = chroma_path
         self.bm25_path   = bm25_path
 
-       # ----------------------------------------------------------------------
-        # ChromaDB - Modified to allow graceful blank index initialization
-        # ----------------------------------------------------------------------
+        # ChromaDB setup
         try:
             self.chroma_client     = chromadb.PersistentClient(path=self.chroma_path)
-            # CHANGED: Using get_or_create_collection so it boots clean if empty
             self.chroma_collection = self.chroma_client.get_or_create_collection(name="regulatory_documents")
             self.logger.info(f"ChromaDB initialized at {self.chroma_path} (Current doc count: {self.chroma_collection.count()})")
         except Exception as e:
-            self.logger.critical(f"ChromaDB connection failed: {e}")
-            # Dynamic recovery guardrail to keep the Streamlit Cloud dashboard alive
             self.chroma_collection = None
+            self.logger.critical(f"ChromaDB connection failed: {e}")
             self.logger.warning("Pipeline proceeding in degraded state. Data ingestion required.")
 
-        # BM25
+        # BM25 setup
         self.bm25_index: Optional[BM25Okapi] = None
         self.doc_id_map: Dict[int, str] = {}
         self._load_bm25_index()
 
-        # Embeddings
+        # Embeddings loading
         self.embedding_generator = EmbeddingGenerator(model_name=EMBEDDING_MODEL)
         self.logger.info(f"Embedding model loaded: {EMBEDDING_MODEL}")
 
@@ -412,7 +394,8 @@ class CrossEncoderReranker:
             self.logger.error(f"Failed to load cross-encoder: {e}")
             self.model = None
 
-def rerank(self, query: str, results: List[RetrieverResult], top_k: int = RERANK_TOP_K) -> List[RetrieverResult]:
+    def rerank(self, query: str, results: List[RetrieverResult], top_k: int = RERANK_TOP_K) -> List[RetrieverResult]:
+        """Calculates cross-attention inference over the retrieved context segments."""
         if not self.model or not results:
             self.logger.warning("Reranking skipped — model unavailable or empty results.")
             return results[:top_k]
@@ -424,12 +407,11 @@ def rerank(self, query: str, results: List[RetrieverResult], top_k: int = RERANK
             if isinstance(scores, float):
                 scores = np.array([scores])
 
-            # --- PATCH: Convert raw logit scores to a clean 0-1 probability scale via Sigmoid ---
+            # Normalized neural response profile maps logit spaces to probabilities
             probabilities = 1 / (1 + np.exp(-scores))
 
             for i, prob in enumerate(probabilities):
                 candidates[i].rerank_score = float(prob)
-            # ----------------------------------------------------------------------------------
 
             ranked = sorted(candidates, key=lambda x: x.rerank_score, reverse=True)
             self.logger.info(f"Reranked {len(candidates)} results; top={max(probabilities):.4f}, bottom={min(probabilities):.4f}")
@@ -441,42 +423,27 @@ def rerank(self, query: str, results: List[RetrieverResult], top_k: int = RERANK
 
 
 # ------------------------------------------------------------------------------
-# RAG PIPELINE
+# RAG PIPELINE COORDINATOR
 # ------------------------------------------------------------------------------
 
 class RAGPipeline:
     """
     Main pipeline coordinator: retrieval → RRF fusion → reranking → LLM generation.
-
-    Parameters
-    ----------
-    llm_type : str
-        One of "openai" or "ollama".
-    llm_model_name : str
-        Ollama model name (used when llm_type="ollama").
-    openai_model_name : str
-        OpenAI-compatible model name (used when llm_type="openai").
-    openai_base_url : Optional[str]
-        Custom base URL for the OpenAI-compatible API endpoint.
-        Pass "https://api.groq.com/openai/v1" to route requests through Groq.
-        Defaults to None, which uses the standard OpenAI endpoint.
-    logger_instance : Optional[logging.Logger]
-        Inject a custom logger; falls back to the module-level logger.
     """
 
     def __init__(
         self,
-        llm_type:          str = "ollama",
+        llm_type:          str = "openai",
         llm_model_name:    str = "llama3",
         openai_model_name: str = "gpt-4o-mini",
-        openai_base_url:   Optional[str] = None,    # ← FIX: new parameter accepted here
+        openai_base_url:   Optional[str] = None,
         logger_instance:   Optional[logging.Logger] = None
     ):
         self.logger            = logger_instance or logger
         self.llm_type          = llm_type.lower()
         self.llm_model_name    = llm_model_name
         self.openai_model_name = openai_model_name
-        self.openai_base_url   = openai_base_url    # ← stored for use in _setup_llm_client
+        self.openai_base_url   = openai_base_url
 
         self.hybrid_retriever = HybridRetriever(logger_instance=self.logger)
         self.reranker         = CrossEncoderReranker(logger_instance=self.logger)
@@ -486,28 +453,23 @@ class RAGPipeline:
         self.logger.info(f"RAGPipeline initialized | provider={self.llm_type} | base_url={self.openai_base_url or 'default'}")
 
     def _setup_llm_client(self) -> None:
-        """Establish the LLM client connection."""
+        """Establish the LLM client connection using custom endpoint matrices (Grok/OpenAI)."""
         if self.llm_type == "openai":
-            api_key = os.getenv("OPENAI_API_KEY")
+            api_key = os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY")
             if not api_key:
-                self.logger.error("OPENAI_API_KEY not set.")
+                self.logger.error("No valid API Key (OPENAI_API_KEY or GROQ_API_KEY) found in system context.")
             try:
                 from openai import OpenAI
-                # FIX: pass base_url only when explicitly provided (e.g. for Groq)
                 if self.openai_base_url:
                     self.openai_client = OpenAI(api_key=api_key, base_url=self.openai_base_url)
-                    self.logger.info(f"OpenAI client configured with custom base_url: {self.openai_base_url}")
+                    self.logger.info(f"OpenAI SDK client mapped to alternative base routing: {self.openai_base_url}")
                 else:
                     self.openai_client = OpenAI(api_key=api_key)
-                    self.logger.info("OpenAI client configured with default endpoint.")
+                    self.logger.info("OpenAI client configured with default production endpoint.")
             except ImportError:
-                self.logger.error("openai package missing. Run: pip install openai")
-
-        elif self.llm_type == "ollama":
-            pass  # Uses direct HTTP calls at inference time
-
+                self.logger.error("openai package missing from container runtime. Verify requirements.")
         else:
-            raise ValueError(f"Unsupported llm_type: '{self.llm_type}'. Choose 'openai' or 'ollama'.")
+            raise ValueError(f"Unsupported llm_type: '{self.llm_type}'. Adjust environment schema.")
 
     def query(
         self,
@@ -539,7 +501,7 @@ class RAGPipeline:
         reranked = self.reranker.rerank(query_text, rrf_results, top_k=RERANK_TOP_K)
         stage_times["reranking"] = time.time() - t
 
-        # 5. Trim to final_top_k
+        # 5. Trim to final matching units
         final = reranked[:final_top_k]
 
         # 6. Build context and generate answer
@@ -558,7 +520,7 @@ class RAGPipeline:
             citations=final,
             retrieved_count=len(final),
             total_processing_time_seconds=total,
-            retrieval_stage_times=stage_times
+            retRetrieval_stage_times=stage_times
         )
 
     def _build_context(self, results: List[RetrieverResult]) -> str:
@@ -611,6 +573,7 @@ class RAGPipeline:
 
         return "No LLM provider matched — ensure llm_type is set to 'openai' for Grok routing."
 
+
 # ------------------------------------------------------------------------------
 # CLI ENTRY POINT
 # ------------------------------------------------------------------------------
@@ -619,7 +582,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Regulatory Compliance RAG CLI")
     parser.add_argument("--query",           type=str,   required=True)
     parser.add_argument("--regulatory-body", type=str,   choices=["RBI", "SEBI", "Basel Committee"], default=None)
-    parser.add_argument("--llm-type",        type=str,   choices=["openai", "ollama"], default="ollama")
+    parser.add_argument("--llm-type",        type=str,   choices=["openai"], default="openai")
     args = parser.parse_args()
 
     print("\n" + "="*80)
@@ -660,7 +623,7 @@ def main() -> None:
         print(f"  Total: {result.total_processing_time_seconds:.4f}s")
         for stage, dur in result.retrieval_stage_times.items():
             if stage != "total":
-                print(f"    • {stage.replace('_', ' ').title()}: {dur:.4f}s")
+                print(f"     • {stage.replace('_', ' ').title()}: {dur:.4f}s")
         print()
 
     except Exception as e:
