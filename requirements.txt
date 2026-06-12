@@ -14,3 +14,8 @@ numpy>=1.26.0
 torch
 transformers
 ollama
+
+# Fixes for OpenTelemetry / Protobuf descriptor crashes
+protobuf>=4.25.3
+opentelemetry-api>=1.24.0
+opentelemetry-sdk>=1.24.0
