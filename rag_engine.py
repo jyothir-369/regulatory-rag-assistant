@@ -612,8 +612,7 @@ class RAGPipeline:
         elif self.llm_type == "ollama":
             try:
                 import requests
-                res = requests.post(
-                    "http://localhost:11434/api/chat",
+                res = requests.post("http://localhost:11434/api/chat"
                     json={
                         "model":   self.llm_model_name,
                         "messages": [
