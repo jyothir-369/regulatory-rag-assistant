@@ -31,6 +31,7 @@ from rank_bm25 import BM25Okapi
 import sentence_transformers
 from sentence_transformers import CrossEncoder
 from dotenv import load_dotenv
+import ollama
 
 
 # ------------------------------------------------------------------------------
