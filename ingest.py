@@ -83,14 +83,10 @@ class IngestionResult:
 def setup_logging() -> logging.Logger:
     """
     Configure comprehensive logging with simultaneous file and console output.
-    
-    Returns:
-        logging.Logger: Coordinated logger instance.
     """
     logger = logging.getLogger("RAGIngestion")
     logger.setLevel(logging.DEBUG)
     
-    # Prevent duplicate handlers if re-initialized
     if logger.handlers:
         return logger
         
@@ -134,7 +130,6 @@ def extract_pdf_text(pdf_path: str, logger: logging.Logger) -> Tuple[str, List[i
     logger.info(f"Initiating binary text extraction sequence for: {path_obj.name}")
     
     try:
-        # Step-by-step audit of the PDF structure directly bypassing problematic encryption property attributes
         with pdfplumber.open(path_obj) as pdf:
             total_pages = len(pdf.pages)
             if total_pages == 0:
@@ -142,21 +137,17 @@ def extract_pdf_text(pdf_path: str, logger: logging.Logger) -> Tuple[str, List[i
                 
             for page_idx, page in enumerate(pdf.pages):
                 page_text = page.extract_text(layout=False)
-                
                 if page_text is None:
                     page_text = ""
                 
-                # Strip control chars but preserve necessary spacing layout parameters
                 cleaned_page_text = "".join(ch for ch in page_text if ord(ch) >= 32 or ch in "\n\t")
                 
-                # Check bounding limits protection layer
                 if len(cleaned_page_text) > MAX_PAGE_SIZE:
                     logger.warning(f"Truncation Warning: Page {page_idx + 1} bounds exceed limit constants.")
                     cleaned_page_text = cleaned_page_text[:MAX_PAGE_SIZE]
                 
                 page_start_indices.append(current_char_position)
                 full_text_accumulator.append(cleaned_page_text)
-                
                 current_char_position += len(cleaned_page_text)
                 
         complete_payload_string = "".join(full_text_accumulator)
@@ -201,12 +192,9 @@ def split_into_pages(text: str, page_starts: List[int]) -> List[Tuple[int, str]]
         end_char = page_starts[idx + 1] if idx + 1 < total_registered_pages else len(text)
         
         page_text = text[start_char:end_char]
-        
-        # Enforce sanitization: squash compounding line breaks, strip perimeter padding
         page_text = re.sub(r'\n{4,}', '\n\n\n', page_text)
         page_text = page_text.strip()
         
-        # Protective drop layer for fundamentally empty pages
         if len(page_text) < 50:
             continue
             
@@ -246,18 +234,15 @@ def create_hierarchical_chunks(
         if token_count == 0:
             continue
             
-        # Optimization check: Keep atomic pages bound together if size fits within target constraints
         if token_count <= CHUNK_SIZE:
             provisional_chunks.append((page_text, tokens, page_num, 0))
             total_token_count += token_count
         else:
-            # Sliding token tracking indexes configuration window logic execution blocks
             start_token_idx = 0
             while start_token_idx < token_count:
                 end_token_idx = start_token_idx + CHUNK_SIZE
                 window_tokens = tokens[start_token_idx:end_token_idx]
                 
-                # Map continuous token spans to raw character windows safely
                 reconstructed_snippet = " ".join(window_tokens)
                 
                 if len(reconstructed_snippet) >= MIN_CHUNK_LENGTH:
@@ -303,22 +288,18 @@ class EmbeddingGenerator:
     """Manages dense vector sentence embeddings infrastructure with inline caching optimization layers."""
     
     def __init__(self, model_name: str = EMBEDDING_MODEL, logger: Optional[logging.Logger] = None):
-        """Initializes foundational structures for sentence transformers processing vectors."""
         self.logger = logger or logging.getLogger("RAGIngestion")
         model_resolution_path = f"sentence-transformers/{model_name}"
         
         self.logger.info(f"Loading dense semantic embedding transformer: {model_resolution_path}")
         self.model = SentenceTransformer(model_resolution_path)
-        self.model.eval()  # Enforce evaluation/inference parameters state explicitly
+        self.model.eval()
         
         self.embedding_dim = self.model.get_sentence_embedding_dimension()
         self.embedding_cache: Dict[str, np.ndarray] = {}
         self.logger.info(f"Embedding infrastructure initialized. Vector Dimension mapping constraints: {self.embedding_dim}")
 
     def generate_embeddings(self, texts: List[str], batch_size: int = BATCH_SIZE) -> np.ndarray:
-        """
-        Processes lists of structural string texts into complete normalized 2D numpy arrays.
-        """
         uncached_texts: List[str] = []
         uncached_indices: List[int] = []
         
@@ -350,7 +331,6 @@ class EmbeddingGenerator:
         return results_array
 
     def embed_single(self, text: str) -> np.ndarray:
-        """Isolated wrapper returning individual text processing output vectors."""
         return self.generate_embeddings([text])[0]
 
 # ==========================================
@@ -533,9 +513,14 @@ def ingest_regulatory_documents(
             # Step 4: Token slicing logic tracking cycles
             internal_document_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, file_name))
             
+            # CRITICAL BUGFIX: Sanitize the document title metadata boundary to remove raw duplicate .pdf tracking artifacts
+            sanitized_title = Path(file_name).name
+            if sanitized_title.lower().endswith('.pdf'):
+                sanitized_title = sanitized_title[:-4]
+            
             document_processed_chunks = create_hierarchical_chunks(
                 page_chunks=reconstituted_page_structures,
-                doc_title=file_name,
+                doc_title=sanitized_title,
                 doc_id=internal_document_uuid,
                 regulatory_body=assigned_regulatory_body,
                 document_path=str(full_pdf_filesystem_path),
