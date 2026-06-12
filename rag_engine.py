@@ -440,21 +440,31 @@ class RAGPipeline:
         logger_instance:   Optional[logging.Logger] = None
     ):
         self.logger            = logger_instance or logger
-        self.llm_type          = llm_type.lower()
+        
+        # Load environment variables early to catch runtime settings
+        load_dotenv()
+        
+        # Override values dynamically if passed from an environment mapping schema
+        env_llm_type = os.getenv("LLM_TYPE")
+        self.llm_type = (env_llm_type.lower() if env_llm_type else llm_type.lower())
+        
         self.llm_model_name    = llm_model_name
-        self.openai_model_name = openai_model_name
-        self.openai_base_url   = openai_base_url
+        
+        env_model = os.getenv("OPENAI_MODEL")
+        self.openai_model_name = env_model if env_model else openai_model_name
+        
+        env_base_url = os.getenv("OPENAI_BASE_URL")
+        self.openai_base_url   = env_base_url if env_base_url else openai_base_url
 
         self.hybrid_retriever = HybridRetriever(logger_instance=self.logger)
         self.reranker         = CrossEncoderReranker(logger_instance=self.logger)
 
-        load_dotenv()
         self._setup_llm_client()
-        self.logger.info(f"RAGPipeline initialized | provider={self.llm_type} | base_url={self.openai_base_url or 'default'}")
+        self.logger.info(f"RAGPipeline initialized | provider={self.llm_type} | base_url={self.openai_base_url or 'default'} | model={self.openai_model_name}")
 
     def _setup_llm_client(self) -> None:
-        """Establish the LLM client connection using custom endpoint matrices (Grok/OpenAI)."""
-        if self.llm_type == "openai":
+        """Establish the LLM client connection supporting custom API routing matrices (Grok/OpenAI)."""
+        if self.llm_type in ["openai", "groq"]:
             api_key = os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY")
             if not api_key:
                 self.logger.error("No valid API Key (OPENAI_API_KEY or GROQ_API_KEY) found in system context.")
@@ -462,10 +472,10 @@ class RAGPipeline:
                 from openai import OpenAI
                 if self.openai_base_url:
                     self.openai_client = OpenAI(api_key=api_key, base_url=self.openai_base_url)
-                    self.logger.info(f"OpenAI SDK client mapped to alternative base routing: {self.openai_base_url}")
+                    self.logger.info(f"LLM SDK client mapped to alternative base routing: {self.openai_base_url}")
                 else:
                     self.openai_client = OpenAI(api_key=api_key)
-                    self.logger.info("OpenAI client configured with default production endpoint.")
+                    self.logger.info("LLM client configured with default production endpoint.")
             except ImportError:
                 self.logger.error("openai package missing from container runtime. Verify requirements.")
         else:
@@ -556,7 +566,7 @@ class RAGPipeline:
         )
         user_prompt = f"Query: {query}\n\nContext:\n{context}\n\nAnswer:"
 
-        if self.llm_type == "openai":
+        if self.llm_type in ["openai", "groq"]:
             try:
                 response = self.openai_client.chat.completions.create(
                     model=self.openai_model_name,
@@ -568,10 +578,10 @@ class RAGPipeline:
                 )
                 return response.choices[0].message.content
             except Exception as e:
-                self.logger.error(f"Grok API inference error: {e}")
+                self.logger.error(f"LLM API inference error: {e}")
                 return f"LLM generation failed: {e}"
 
-        return "No LLM provider matched — ensure llm_type is set to 'openai' for Grok routing."
+        return f"No LLM provider matched — ensure llm_type is set to 'openai' or 'groq' for custom routing. Current type: {self.llm_type}"
 
 
 # ------------------------------------------------------------------------------
@@ -582,11 +592,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Regulatory Compliance RAG CLI")
     parser.add_argument("--query",           type=str,   required=True)
     parser.add_argument("--regulatory-body", type=str,   choices=["RBI", "SEBI", "Basel Committee"], default=None)
-    parser.add_argument("--llm-type",        type=str,   choices=["openai"], default="openai")
+    parser.add_argument("--llm-type",        type=str,   choices=["openai", "groq"], default="openai")
     args = parser.parse_args()
 
     print("\n" + "="*80)
-    print(f"🚀 REGULATORY COMPLIANCE RAG  |  LLM: {args.llm_type.upper()}")
+    print(f"🚀 REGULATORY COMPLIANCE RAG  |  LLM TYPE: {args.llm_type.upper()}")
     print("="*80 + "\n")
 
     try:
