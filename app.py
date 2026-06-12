@@ -118,10 +118,6 @@ def configure_streamlit_page():
 def initialize_rag_pipeline(llm_type: str = "ollama") -> Optional[RAGPipeline]:
     """
     Initialize the RAG pipeline.
-
-    FIX: The Groq branch now passes `openai_base_url` to RAGPipeline, which
-    accepts and forwards it to the OpenAI SDK client. This resolves the
-    TypeError: RAGPipeline.__init__() got an unexpected keyword argument 'openai_base_url'.
     """
     logger = setup_logging()
     logger.info(f"Initializing RAG pipeline with {llm_type}...")
@@ -134,22 +130,18 @@ def initialize_rag_pipeline(llm_type: str = "ollama") -> Optional[RAGPipeline]:
             pipeline = RAGPipeline(
                 llm_type="openai",
                 openai_model_name="gpt-4o-mini"
-                # openai_base_url intentionally omitted — defaults to OpenAI's endpoint
             )
 
         elif llm_type == "groq":
-            # Groq exposes an OpenAI-compatible API; we route traffic via openai_base_url.
-            # Prefer GROQ_API_KEY; fall back to OPENAI_API_KEY for backwards compatibility.
             groq_key = os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY")
             if not groq_key:
                 st.error("❌ Neither `GROQ_API_KEY` nor `OPENAI_API_KEY` found in `.env` file.")
                 return None
-            # The OpenAI SDK reads OPENAI_API_KEY; make the Groq key available under that name.
             os.environ["OPENAI_API_KEY"] = groq_key
             pipeline = RAGPipeline(
                 llm_type="openai",
                 openai_model_name="llama-3.3-70b-versatile",
-                openai_base_url="https://api.groq.com/openai/v1"   # ← now handled by RAGPipeline
+                openai_base_url="https://api.groq.com/openai/v1"
             )
 
         elif llm_type == "ollama":
@@ -221,7 +213,7 @@ def render_sidebar() -> int:
             {"value": "openai", "label": LLM_OPTIONS["openai"]["name"]},
             {"value": "groq",   "label": LLM_OPTIONS["groq"]["name"]}
         ]
-        current_idx = {"ollama": 0, "openai": 1, "groq": 2}.get(st.session_state[LLM_TYPE_KEY], 0)
+        current_idx = {"ollama": 0, "openai": 1, "groq": 2].get(st.session_state[LLM_TYPE_KEY], 0)
 
         llm_selection = st.selectbox(
             label="🤖 LLM Provider",
@@ -246,7 +238,7 @@ def render_sidebar() -> int:
             api_key = st.text_input(key_label, type="password", help=f"Get your key at {key_help}")
             if api_key:
                 os.environ[env_var]          = api_key
-                os.environ["OPENAI_API_KEY"] = api_key   # OpenAI SDK always reads this
+                os.environ["OPENAI_API_KEY"] = api_key
 
         selected_body = st.selectbox(
             label="🏛️ Regulatory Body Filter",
@@ -257,6 +249,45 @@ def render_sidebar() -> int:
             st.session_state[REGULATORY_BODY_KEY] = selected_body
 
         top_k = st.slider("📊 Number of Citations (Top K)", min_value=1, max_value=10, value=DEFAULT_TOP_K, step=1)
+
+        # 📥 NEW: RUNTIME DOCUMENT INGESTION INTERFACE FOR CLOUD CONTAINERS
+        st.markdown("---")
+        st.subheader("📥 Ingest Documents")
+        uploaded_files = st.file_uploader(
+            "Upload Regulatory PDFs (RBI, SEBI, Basel III)", 
+            type=["pdf"], 
+            accept_multiple_files=True,
+            help="Directly parse and embed fresh statutory frameworks into ChromaDB"
+        )
+
+        if uploaded_files and st.button("🏗️ Index Framework Documents", use_container_width=True):
+            os.makedirs("data", exist_ok=True)
+            pipeline = initialize_rag_pipeline(st.session_state[LLM_TYPE_KEY])
+            
+            if pipeline:
+                success_count = 0
+                for file in uploaded_files:
+                    with st.spinner(f"Ingesting {file.name}..."):
+                        file_path = os.path.join("data", file.name)
+                        with open(file_path, "wb") as f:
+                            f.write(file.getbuffer())
+                        
+                        try:
+                            # Assumes a matching document ingestion method exists on RAGPipeline
+                            if hasattr(pipeline, 'ingest_document'):
+                                pipeline.ingest_document(file_path)
+                            elif hasattr(pipeline, 'ingest'):
+                                pipeline.ingest(file_path)
+                            success_count += 1
+                        except Exception as ingest_err:
+                            st.error(f"Failed to ingest {file.name}: {ingest_err}")
+                
+                if success_count > 0:
+                    st.success(f"🎯 Successfully indexed {success_count} framework files!")
+                    # Clear st.cache_resource or state if necessary to point back to fresh DB metrics
+                    st.session_state["last_result"] = None
+                    time.sleep(1.5)
+                    st.rerun()
 
         st.markdown("---")
         if st.button("🗑️ Clear Chat History", use_container_width=True):
@@ -449,16 +480,16 @@ def handle_query_error(error: Exception, query: str):
     elif "ollama" in err_str:
         st.markdown("- Run `ollama serve` and ensure `llama3` is pulled.")
     elif "chroma" in err_str or "collection" in err_str:
-        st.markdown("- Run `python ingest.py` to build the vector index.")
+        st.markdown("- Use the sidebar ingestion portal to rebuild the vector index.")
     else:
-        st.markdown("- Confirm PDFs are in `/data` and ingestion completed successfully.")
+        st.markdown("- Confirm uploaded PDFs match the targeted indexing formats.")
 
     if st.button("🔄 Retry", key="retry_btn"):
         st.rerun()
 
 
 # ==============================================================================
-# MAIN
+# MAIN MAIN ENGINE
 # ==============================================================================
 
 def main():
