@@ -214,7 +214,7 @@ def render_sidebar() -> int:
             {"value": "groq",   "label": LLM_OPTIONS["groq"]["name"]}
         ]
         
-        # FIXED: Changed closing bracket ']' to curly brace '}'
+        # FIXED syntax error here:
         current_idx = {"ollama": 0, "openai": 1, "groq": 2}.get(st.session_state[LLM_TYPE_KEY], 0)
 
         llm_selection = st.selectbox(
@@ -252,7 +252,7 @@ def render_sidebar() -> int:
 
         top_k = st.slider("📊 Number of Citations (Top K)", min_value=1, max_value=10, value=DEFAULT_TOP_K, step=1)
 
-        # 📥 INGESTION SYSTEM FOR WEB APP IN CLOUD CONTAINERS
+        # 📥 INGESTION SYSTEM FOR WEB APP
         st.markdown("---")
         st.subheader("📥 Ingest Documents")
         uploaded_files = st.file_uploader(
@@ -275,13 +275,18 @@ def render_sidebar() -> int:
                             f.write(file.getbuffer())
                         
                         try:
+                            # Enhanced visibility to expose internal errors if ingestion fails
                             if hasattr(pipeline, 'ingest_document'):
                                 pipeline.ingest_document(file_path)
+                                success_count += 1
                             elif hasattr(pipeline, 'ingest'):
                                 pipeline.ingest(file_path)
-                            success_count += 1
+                                success_count += 1
+                            else:
+                                st.error(f"❌ Could not find an intake function inside your rag_engine.py configuration context.")
                         except Exception as ingest_err:
-                            st.error(f"Failed to ingest {file.name}: {ingest_err}")
+                            st.error(f"Failed to process and chunk {file.name} context.")
+                            st.exception(ingest_err)
                 
                 if success_count > 0:
                     st.success(f"🎯 Successfully indexed {success_count} framework files!")
@@ -402,7 +407,7 @@ def render_answer(result: QueryResult):
                     st.plotly_chart(fig, use_container_width=True)
 
         st.markdown("🔗 **Source Citations**")
-        if getattr(result, 'citations', None):
+        if getattr(result, 'citations', None) and result.retrieved_count > 0:
             for i, cit in enumerate(result.citations):
                 render_citation(cit, i + 1)
         else:
