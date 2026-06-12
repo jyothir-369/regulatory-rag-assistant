@@ -412,7 +412,7 @@ class CrossEncoderReranker:
             self.logger.error(f"Failed to load cross-encoder: {e}")
             self.model = None
 
-    def rerank(self, query: str, results: List[RetrieverResult], top_k: int = RERANK_TOP_K) -> List[RetrieverResult]:
+def rerank(self, query: str, results: List[RetrieverResult], top_k: int = RERANK_TOP_K) -> List[RetrieverResult]:
         if not self.model or not results:
             self.logger.warning("Reranking skipped — model unavailable or empty results.")
             return results[:top_k]
@@ -424,11 +424,15 @@ class CrossEncoderReranker:
             if isinstance(scores, float):
                 scores = np.array([scores])
 
-            for i, score in enumerate(scores):
-                candidates[i].rerank_score = float(score)
+            # --- PATCH: Convert raw logit scores to a clean 0-1 probability scale via Sigmoid ---
+            probabilities = 1 / (1 + np.exp(-scores))
+
+            for i, prob in enumerate(probabilities):
+                candidates[i].rerank_score = float(prob)
+            # ----------------------------------------------------------------------------------
 
             ranked = sorted(candidates, key=lambda x: x.rerank_score, reverse=True)
-            self.logger.info(f"Reranked {len(candidates)} results; top={max(scores):.4f}, bottom={min(scores):.4f}")
+            self.logger.info(f"Reranked {len(candidates)} results; top={max(probabilities):.4f}, bottom={min(probabilities):.4f}")
             return ranked[:top_k]
 
         except Exception as e:
