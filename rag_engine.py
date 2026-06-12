@@ -606,33 +606,10 @@ class RAGPipeline:
                 )
                 return response.choices[0].message.content
             except Exception as e:
-                self.logger.error(f"OpenAI API error: {e}")
+                self.logger.error(f"Grok API inference error: {e}")
                 return f"LLM generation failed: {e}"
 
-        elif self.llm_type == "ollama":
-            try:
-                import requests
-                res = requests.post("http://localhost:11434/api/chat"
-                    json={
-                        "model":   self.llm_model_name,
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user",   "content": user_prompt}
-                        ],
-                        "options": {"temperature": 0.1},
-                        "stream":  False
-                    },
-                    timeout=180  # <-- Increased to 3 minutes to give your hardware breathing room
-                )
-                if res.status_code == 200:
-                    return res.json().get("message", {}).get("content", "Empty response from Ollama.")
-                return f"Ollama returned HTTP {res.status_code}"
-            except Exception as e:
-                self.logger.error(f"Ollama request error: {e}")
-                return f"Ollama communication error: {e}"
-
-        return "No LLM provider matched — check llm_type configuration."
-
+        return "No LLM provider matched — ensure llm_type is set to 'openai' for Grok routing."
 
 # ------------------------------------------------------------------------------
 # CLI ENTRY POINT
