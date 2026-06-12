@@ -22,16 +22,13 @@ import argparse
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Dict, Tuple, Optional, Any, Set, Union
-from collections import Counter
-
 import numpy as np
+
 import chromadb
 from chromadb.config import Settings
 from rank_bm25 import BM25Okapi
-import sentence_transformers
 from sentence_transformers import CrossEncoder
 from dotenv import load_dotenv
-
 
 # ------------------------------------------------------------------------------
 # DATA CLASSES
@@ -85,7 +82,7 @@ class TextChunk:
 
 
 # ------------------------------------------------------------------------------
-# CONFIGURATION
+# GLOBAL GLOBAL PARAMETERS & ARCHITECTURE VALUES
 # ------------------------------------------------------------------------------
 
 VECTOR_TOP_K:       int   = 10
@@ -120,16 +117,29 @@ class RetrieverResult:
 @dataclass
 class QueryResult:
     """Full pipeline response including answer, citations, and timing."""
-    query:                        str
+    query:                         str
     answers:                      str
     citations:                    List[RetrieverResult]
     retrieved_count:              int
     total_processing_time_seconds: float
-    retRetrieval_stage_times:     Dict[str, float]
+    retrieval_stage_times:        Dict[str, float]
+
+
+@dataclass
+class RetrievalMetrics:
+    """Evaluation metrics for retrieval quality profiling."""
+    hit_rate_at_3:          float
+    hit_rate_at_5:          float
+    hit_rate_at_10:         float
+    mean_reciprocal_rank:   float
+    average_vector_score:   float
+    average_bm25_score:     float
+    average_rerank_score:   float
+    total_queries_evaluated: int
 
 
 # ------------------------------------------------------------------------------
-# LOGGING
+# LOGGING SYSTEM SETUP
 # ------------------------------------------------------------------------------
 
 def setup_logging() -> logging.Logger:
@@ -176,11 +186,11 @@ class EmbeddingGenerator:
 
 
 # ------------------------------------------------------------------------------
-# HYBRID RETRIEVER
+# HYBRID RETRIEVER LAYER
 # ------------------------------------------------------------------------------
 
 class HybridRetriever:
-    """Manages dense (ChromaDB) and sparse (BM25) retrieval."""
+    """Manages dense (ChromaDB) and sparse (BM25) retrieval layers."""
 
     def __init__(
         self,
@@ -192,22 +202,22 @@ class HybridRetriever:
         self.chroma_path = chroma_path
         self.bm25_path   = bm25_path
 
-        # ChromaDB setup
+        # ChromaDB Core Initialization
         try:
             self.chroma_client     = chromadb.PersistentClient(path=self.chroma_path)
             self.chroma_collection = self.chroma_client.get_or_create_collection(name="regulatory_documents")
             self.logger.info(f"ChromaDB initialized at {self.chroma_path} (Current doc count: {self.chroma_collection.count()})")
         except Exception as e:
-            self.chroma_collection = None
             self.logger.critical(f"ChromaDB connection failed: {e}")
+            self.chroma_collection = None
             self.logger.warning("Pipeline proceeding in degraded state. Data ingestion required.")
 
-        # BM25 setup
+        # BM25 Lexical Configuration
         self.bm25_index: Optional[BM25Okapi] = None
         self.doc_id_map: Dict[int, str] = {}
         self._load_bm25_index()
 
-        # Embeddings loading
+        # Transformer Neural Embeddings Instance
         self.embedding_generator = EmbeddingGenerator(model_name=EMBEDDING_MODEL)
         self.logger.info(f"Embedding model loaded: {EMBEDDING_MODEL}")
 
@@ -238,6 +248,8 @@ class HybridRetriever:
         regulatory_body: Optional[str] = None
     ) -> List[Tuple[str, Dict, float]]:
         """Dense retrieval via ChromaDB cosine similarity."""
+        if self.chroma_collection is None:
+            return []
         try:
             embedding   = self.embedding_generator.embed_single(query)
             filter_dict = {"regulatory_body": regulatory_body} if regulatory_body else None
@@ -273,7 +285,7 @@ class HybridRetriever:
         top_k: int = BM25_TOP_K,
         regulatory_body: Optional[str] = None
     ) -> List[Tuple[str, Dict, float]]:
-        """Sparse BM25 retrieval."""
+        """Sparse BM25 lexical keyword retrieval."""
         if not self.bm25_index:
             self.logger.error("BM25 index not loaded.")
             return []
@@ -309,6 +321,8 @@ class HybridRetriever:
             return []
 
     def _get_metadata_by_chunk_id(self, chunk_id: str) -> Dict:
+        if self.chroma_collection is None:
+            return {}
         try:
             res = self.chroma_collection.get(ids=[chunk_id], include=["metadatas", "documents"])
             if res and res["metadatas"]:
@@ -321,7 +335,7 @@ class HybridRetriever:
 
 
 # ------------------------------------------------------------------------------
-# RECIPROCAL RANK FUSION
+# RECIPROCAL RANK FUSION LAYER
 # ------------------------------------------------------------------------------
 
 def reciprocal_rank_fusion(
@@ -342,7 +356,7 @@ def reciprocal_rank_fusion(
         vr = v_rank.get(cid)
         br = b_rank.get(cid)
         sv = weight_vector / (k + vr)  if vr is not None else weight_vector / (k + len(vector_results) + 1)
-        sb = weight_bm25   / (k + br)  if br is not None else weight_bm25   / (k + len(bm25_results)   + 1)
+        sb = weight_bm25   / (k + br)  if br is not None else weight_bm25   / (k + len(bm25_results)    + 1)
         rrf_scores[cid] = sv + sb
 
     v_lookup = {cid: (m, s) for cid, m, s in vector_results}
@@ -378,11 +392,11 @@ def reciprocal_rank_fusion(
 
 
 # ------------------------------------------------------------------------------
-# CROSS-ENCODER RERANKER
+# DEEP-LEARNING NEURAL RERANKER
 # ------------------------------------------------------------------------------
 
 class CrossEncoderReranker:
-    """Reranks candidates using a cross-attention neural model."""
+    """Reranks retrieved document candidates using a cross-attention neural model."""
 
     def __init__(self, model_name: str = RERANK_MODEL, logger_instance: Optional[logging.Logger] = None):
         self.logger     = logger_instance or logger
@@ -395,7 +409,6 @@ class CrossEncoderReranker:
             self.model = None
 
     def rerank(self, query: str, results: List[RetrieverResult], top_k: int = RERANK_TOP_K) -> List[RetrieverResult]:
-        """Calculates cross-attention inference over the retrieved context segments."""
         if not self.model or not results:
             self.logger.warning("Reranking skipped — model unavailable or empty results.")
             return results[:top_k]
@@ -407,14 +420,11 @@ class CrossEncoderReranker:
             if isinstance(scores, float):
                 scores = np.array([scores])
 
-            # Normalized neural response profile maps logit spaces to probabilities
-            probabilities = 1 / (1 + np.exp(-scores))
-
-            for i, prob in enumerate(probabilities):
-                candidates[i].rerank_score = float(prob)
+            for i, score in enumerate(scores):
+                candidates[i].rerank_score = float(score)
 
             ranked = sorted(candidates, key=lambda x: x.rerank_score, reverse=True)
-            self.logger.info(f"Reranked {len(candidates)} results; top={max(probabilities):.4f}, bottom={min(probabilities):.4f}")
+            self.logger.info(f"Reranked {len(candidates)} results; top={max(scores):.4f}, bottom={min(scores):.4f}")
             return ranked[:top_k]
 
         except Exception as e:
@@ -423,63 +433,76 @@ class CrossEncoderReranker:
 
 
 # ------------------------------------------------------------------------------
-# RAG PIPELINE COORDINATOR
+# CORE COORDINATION PIPELINE
 # ------------------------------------------------------------------------------
 
 class RAGPipeline:
     """
     Main pipeline coordinator: retrieval → RRF fusion → reranking → LLM generation.
+    Optimized to safely handle Multi-LLM Routing matrix endpoints (OpenAI, Groq, xAI).
     """
 
     def __init__(
         self,
-        llm_type:          str = "openai",
+        llm_type:          Optional[str] = None,       
         llm_model_name:    str = "llama3",
         openai_model_name: str = "gpt-4o-mini",
-        openai_base_url:   Optional[str] = None,
+        openai_base_url:   Optional[str] = None,    
         logger_instance:   Optional[logging.Logger] = None
     ):
-        self.logger            = logger_instance or logger
-        
-        # Load environment variables early to catch runtime settings
+        self.logger = logger_instance or logger
         load_dotenv()
-        
-        # Override values dynamically if passed from an environment mapping schema
+
+        # Fallback evaluation matrix to capture cloud deployment configuration keys
         env_llm_type = os.getenv("LLM_TYPE")
-        self.llm_type = (env_llm_type.lower() if env_llm_type else llm_type.lower())
-        
-        self.llm_model_name    = llm_model_name
-        
-        env_model = os.getenv("OPENAI_MODEL")
-        self.openai_model_name = env_model if env_model else openai_model_name
-        
-        env_base_url = os.getenv("OPENAI_BASE_URL")
-        self.openai_base_url   = env_base_url if env_base_url else openai_base_url
+        if llm_type:
+            self.llm_type = llm_type.lower()
+        elif env_llm_type:
+            self.llm_type = env_llm_type.lower()
+        else:
+            self.llm_type = "openai" 
+
+        self.llm_model_name    = os.getenv("LLM_MODEL_NAME", llm_model_name)
+        self.openai_model_name = os.getenv("OPENAI_MODEL_NAME", openai_model_name)
+        self.openai_base_url   = openai_base_url or os.getenv("OPENAI_BASE_URL")
 
         self.hybrid_retriever = HybridRetriever(logger_instance=self.logger)
         self.reranker         = CrossEncoderReranker(logger_instance=self.logger)
 
+        # Explicit attribute initialization prevents downstream initialization AttributeErrors
+        self.openai_client = None 
+
         self._setup_llm_client()
-        self.logger.info(f"RAGPipeline initialized | provider={self.llm_type} | base_url={self.openai_base_url or 'default'} | model={self.openai_model_name}")
+        self.logger.info(f"RAGPipeline initialized | provider={self.llm_type} | base_url={self.openai_base_url or 'default'}")
 
     def _setup_llm_client(self) -> None:
-        """Establish the LLM client connection supporting custom API routing matrices (Grok/OpenAI)."""
-        if self.llm_type in ["openai", "groq"]:
-            api_key = os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY")
+        """Establish the LLM connection layer securely without silent class failures."""
+        openai_equivalent_types = ["openai", "groq", "grok", "xai"]
+
+        if self.llm_type in openai_equivalent_types:
+            api_key = os.getenv("OPENAI_API_KEY") or os.getenv("GROQ_API_KEY") or os.getenv("XAI_API_KEY")
+            
             if not api_key:
-                self.logger.error("No valid API Key (OPENAI_API_KEY or GROQ_API_KEY) found in system context.")
+                self.logger.error("API Key initialization aborted: missing token in environment variables.")
+                return
+
             try:
                 from openai import OpenAI
                 if self.openai_base_url:
                     self.openai_client = OpenAI(api_key=api_key, base_url=self.openai_base_url)
-                    self.logger.info(f"LLM SDK client mapped to alternative base routing: {self.openai_base_url}")
+                    self.logger.info(f"OpenAI-compatible engine routed to endpoint: {self.openai_base_url}")
                 else:
                     self.openai_client = OpenAI(api_key=api_key)
-                    self.logger.info("LLM client configured with default production endpoint.")
+                    self.logger.info("OpenAI client configured with default engine endpoint.")
             except ImportError:
-                self.logger.error("openai package missing from container runtime. Verify requirements.")
+                self.logger.error("Dependencies configuration mismatch: 'openai' library missing.")
+
+        elif self.llm_type == "ollama":
+            self.logger.info("Ollama routing set active. Generation context mapped directly to localized instance loops.")
+            self.openai_client = None
+
         else:
-            raise ValueError(f"Unsupported llm_type: '{self.llm_type}'. Adjust environment schema.")
+            raise ValueError(f"Unsupported llm_type validation mismatch: '{self.llm_type}'.")
 
     def query(
         self,
@@ -511,7 +534,7 @@ class RAGPipeline:
         reranked = self.reranker.rerank(query_text, rrf_results, top_k=RERANK_TOP_K)
         stage_times["reranking"] = time.time() - t
 
-        # 5. Trim to final matching units
+        # 5. Trim to final_top_k
         final = reranked[:final_top_k]
 
         # 6. Build context and generate answer
@@ -530,7 +553,7 @@ class RAGPipeline:
             citations=final,
             retrieved_count=len(final),
             total_processing_time_seconds=total,
-            retRetrieval_stage_times=stage_times
+            retrieval_stage_times=stage_times
         )
 
     def _build_context(self, results: List[RetrieverResult]) -> str:
@@ -548,7 +571,6 @@ class RAGPipeline:
         if len(context) > MAX_CONTEXT_LENGTH:
             self.logger.warning(f"Context truncated to {MAX_CONTEXT_LENGTH} chars.")
             context = context[:MAX_CONTEXT_LENGTH] + "\n[TRUNCATED]"
-        self.logger.info(f"Context built: {len(results)} chunks, {len(context)} chars")
         return context
 
     def _generate_answer(self, query: str, context: str) -> str:
@@ -566,7 +588,11 @@ class RAGPipeline:
         )
         user_prompt = f"Query: {query}\n\nContext:\n{context}\n\nAnswer:"
 
-        if self.llm_type in ["openai", "groq"]:
+        openai_equivalent_types = ["openai", "groq", "grok", "xai"]
+        
+        if self.llm_type in openai_equivalent_types:
+            if not self.openai_client:
+                return "LLM generation failed: OpenAI-compatible engine was not properly instantiated during bootstrap routing."
             try:
                 response = self.openai_client.chat.completions.create(
                     model=self.openai_model_name,
@@ -578,25 +604,48 @@ class RAGPipeline:
                 )
                 return response.choices[0].message.content
             except Exception as e:
-                self.logger.error(f"LLM API inference error: {e}")
+                self.logger.error(f"OpenAI SDK connection execution exception: {e}")
                 return f"LLM generation failed: {e}"
 
-        return f"No LLM provider matched — ensure llm_type is set to 'openai' or 'groq' for custom routing. Current type: {self.llm_type}"
+        elif self.llm_type == "ollama":
+            try:
+                import requests
+                res = requests.post(
+                    "http://localhost:11434/api/chat",
+                    json={
+                        "model":   self.llm_model_name,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user",   "content": user_prompt}
+                        ],
+                        "options": {"temperature": 0.1},
+                        "stream":  False
+                    },
+                    timeout=180
+                )
+                if res.status_code == 200:
+                    return res.json().get("message", {}).get("content", "Empty response from Ollama.")
+                return f"Ollama returned HTTP {res.status_code}"
+            except Exception as e:
+                self.logger.error(f"Ollama request error: {e}")
+                return f"Ollama communication error: {e}"
+
+        return "No LLM provider matched — check llm_type configuration."
 
 
 # ------------------------------------------------------------------------------
-# CLI ENTRY POINT
+# CLI ENTRY RUN TIME HANDLER
 # ------------------------------------------------------------------------------
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Regulatory Compliance RAG CLI")
     parser.add_argument("--query",           type=str,   required=True)
     parser.add_argument("--regulatory-body", type=str,   choices=["RBI", "SEBI", "Basel Committee"], default=None)
-    parser.add_argument("--llm-type",        type=str,   choices=["openai", "groq"], default="openai")
+    parser.add_argument("--llm-type",        type=str,   choices=["openai", "ollama"], default="ollama")
     args = parser.parse_args()
 
     print("\n" + "="*80)
-    print(f"🚀 REGULATORY COMPLIANCE RAG  |  LLM TYPE: {args.llm_type.upper()}")
+    print(f"🚀 REGULATORY COMPLIANCE RAG  |  LLM: {args.llm_type.upper()}")
     print("="*80 + "\n")
 
     try:
@@ -633,7 +682,7 @@ def main() -> None:
         print(f"  Total: {result.total_processing_time_seconds:.4f}s")
         for stage, dur in result.retrieval_stage_times.items():
             if stage != "total":
-                print(f"     • {stage.replace('_', ' ').title()}: {dur:.4f}s")
+                print(f"    • {stage.replace('_', ' ').title()}: {dur:.4f}s")
         print()
 
     except Exception as e:
